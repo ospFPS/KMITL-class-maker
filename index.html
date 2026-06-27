@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KMITL Class Schedule Maker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">KMITL Planner</p>
+        <h1>KMITL Class schedule maker</h1>
+        <p class="hero-text">
+          Add lectures or labs, then arrange everything into a clean weekly timetable for KMITL.
+        </p>
+      </div>
+      <div class="hero-card">
+        <p class="hero-card-title">Quick Tips</p>
+        <ul>
+          <li>Use clear course names so your schedule is easy to scan.</li>
+          <li>Pick a color for each class to spot overlaps faster.</li>
+        </ul>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="board-strip" aria-label="Schedule workspace">
+        <article class="strip-card">
+          <span class="strip-label">Step 1</span>
+          <strong>Add Class</strong>
+          <p>Enter each KMITL lecture or lab into the planner.</p>
+        </article>
+        <article class="strip-card">
+          <span class="strip-label">Step 2</span>
+          <strong>Your Class</strong>
+          <p>Check saved subjects, export them, or remove anything quickly.</p>
+        </article>
+        <article class="strip-card">
+          <span class="strip-label">Step 3</span>
+          <strong>Class Timetable</strong>
+          <p>See the full week laid out in one workspace.</p>
+        </article>
+      </section>
+
+      <div class="app-layout">
+        <div class="composer-stack">
+        <section class="panel form-panel">
+          <div class="panel-head">
+            <h2>Add Class</h2>
+            <p>Create one block per meeting time.</p>
+          </div>
+
+          <form id="class-form" class="class-form">
+            <p id="edit-status" class="edit-status" hidden>Editing selected class</p>
+            <div class="form-row form-row-wide">
+              <label>
+                <span>Course name</span>
+                <input type="text" id="courseName" placeholder="Calculus I" required>
+              </label>
+            </div>
+
+            <div class="form-row">
+              <label>
+                <span>Day</span>
+                <select id="day" required>
+                  <option value="Monday">Monday</option>
+                  <option value="Tuesday">Tuesday</option>
+                  <option value="Wednesday">Wednesday</option>
+                  <option value="Thursday">Thursday</option>
+                  <option value="Friday">Friday</option>
+                </select>
+              </label>
+              <label>
+                <span>Room</span>
+                <input type="text" id="room" placeholder="Engineering 402">
+              </label>
+              <label>
+                <span>Instructor</span>
+                <input type="text" id="instructor" placeholder="Ajarn Somchai">
+              </label>
+            </div>
+
+            <div class="form-row">
+              <label>
+                <span>Start time</span>
+                <input type="time" id="startTime" min="09:00" max="20:00" required>
+              </label>
+              <label>
+                <span>End time</span>
+                <input type="time" id="endTime" min="09:30" max="20:00" required>
+              </label>
+              <label class="color-field">
+                <span>Color</span>
+                <input type="color" id="color" value="#f97316">
+              </label>
+            </div>
+
+            <div class="form-row form-row-actions">
+              <div class="form-actions">
+                <button id="submit-btn" type="submit" class="primary-btn">Add to schedule</button>
+                <button id="reset-btn" type="reset" class="ghost-btn">Clear form</button>
+              </div>
+            </div>
+          </form>
+        </section>
+
+        <section class="panel sidebar-panel">
+          <div class="panel-head">
+            <h2>Your Class</h2>
+            <p id="class-count">0 classes added</p>
+          </div>
+
+          <div class="toolbar">
+            <button id="save-btn" class="ghost-btn" type="button">Export JSON</button>
+            <label class="upload-btn">
+              <input id="load-input" type="file" accept="application/json">
+              Import JSON
+            </label>
+            <button id="clear-btn" class="danger-btn" type="button">Clear all</button>
+          </div>
+
+          <div id="empty-state" class="empty-state">
+            Add your first class to generate the timetable.
+          </div>
+
+          <div id="class-list" class="class-list"></div>
+        </section>
+        </div>
+
+        <section class="panel schedule-panel">
+          <div class="panel-head schedule-head">
+            <div>
+              <h2>Class Timetable</h2>
+            </div>
+            <div class="schedule-actions">
+              <button id="export-image-btn" class="ghost-btn" type="button">Phone wallpaper</button>
+              <button id="tablet-wallpaper-btn" class="primary-btn" type="button">Tablet wallpaper</button>
+            </div>
+          </div>
+          <div class="schedule-wrap">
+            <div id="schedule-grid" class="schedule-grid"></div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <template id="class-item-template">
+    <article class="class-item">
+      <div class="class-color"></div>
+      <div class="class-item-body">
+        <div class="class-item-top">
+          <h3 class="class-title"></h3>
+          <div class="class-item-actions">
+            <button class="icon-btn edit-btn" type="button" aria-label="Edit class">Edit</button>
+            <button class="icon-btn delete-btn" type="button" aria-label="Delete class">Delete</button>
+          </div>
+        </div>
+        <p class="class-meta"></p>
+        <p class="class-submeta"></p>
+      </div>
+    </article>
+  </template>
+
+  <div id="preview-modal" class="preview-modal" hidden>
+    <div class="preview-backdrop" data-close-preview="true"></div>
+    <section class="preview-panel" aria-label="Wallpaper preview">
+      <div class="preview-head">
+        <h3>Phone Wallpaper Preview</h3>
+        <div class="preview-actions">
+          <button id="download-preview-btn" class="primary-btn" type="button">Download PNG</button>
+          <button id="close-preview-btn" class="ghost-btn" type="button">Close</button>
+        </div>
+      </div>
+      <div class="preview-image-wrap">
+        <img id="preview-image" alt="Wallpaper preview">
+      </div>
+    </section>
+  </div>
+
+  <div id="tablet-preview-modal" class="preview-modal" hidden>
+    <div class="preview-backdrop" data-close-tablet-preview="true"></div>
+    <section class="preview-panel" aria-label="Tablet wallpaper preview">
+      <div class="preview-head">
+        <h3>Tablet Wallpaper Preview</h3>
+        <div class="preview-actions">
+          <button id="download-tablet-preview-btn" class="primary-btn" type="button">Download PNG</button>
+          <button id="close-tablet-preview-btn" class="ghost-btn" type="button">Close</button>
+        </div>
+      </div>
+      <div class="preview-image-wrap">
+        <img id="tablet-preview-image" alt="Tablet wallpaper preview">
+      </div>
+    </section>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
