@@ -11,8 +11,6 @@ const form = document.getElementById("class-form");
 const classList = document.getElementById("class-list");
 const emptyState = document.getElementById("empty-state");
 const classCount = document.getElementById("class-count");
-const saveBtn = document.getElementById("save-btn");
-const loadInput = document.getElementById("load-input");
 const clearBtn = document.getElementById("clear-btn");
 const exportImageBtn = document.getElementById("export-image-btn");
 const tabletWallpaperBtn = document.getElementById("tablet-wallpaper-btn");
@@ -605,35 +603,6 @@ form.addEventListener("submit", (event) => {
 
   resetFormState(true);
   syncUi();
-});
-
-saveBtn.addEventListener("click", () => {
-  const blob = new Blob([JSON.stringify(state.classes, null, 2)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "kmitl-schedule.json";
-  link.click();
-  URL.revokeObjectURL(url);
-});
-
-loadInput.addEventListener("change", async (event) => {
-  const file = event.target.files?.[0];
-  if (!file) return;
-
-  try {
-    const text = await file.text();
-    const parsed = JSON.parse(text);
-    if (!Array.isArray(parsed)) {
-      throw new Error("Invalid schedule file");
-    }
-    state.classes = parsed;
-    syncUi();
-  } catch {
-    alert("Could not import that JSON file.");
-  } finally {
-    loadInput.value = "";
-  }
 });
 
 clearBtn.addEventListener("click", () => {
